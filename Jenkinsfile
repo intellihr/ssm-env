@@ -10,6 +10,14 @@ pipeline {
   }
 
   stages {
+    stage('prepare') {
+      steps {
+        script {
+          env.COMMIT_HASH = sh(returnStdout: true, script: 'git rev-parse HEAD').trim().take(7)
+        }
+      }
+    }
+
     stage('build') {
       steps {
         sh 'docker-compose run build'
@@ -22,15 +30,13 @@ pipeline {
       }
     }
 
-
     stage('release') {
       when {
         branch 'intellihr'
       }
       steps {
         withAWSParameterStore(namePrefixes: '/jenkins/GITHUB_USERNAME,/jenkins/GITHUB_API_TOKEN', regionName: env.AWS_REGION) {
-          sh 'docker-compose run --rm build cp bin/ssm-env /output'
-          sh '.ci/scripts/release.sh'
+          sh 'docker-compose run --rm build .ci/scripts/release.sh'
         }
       }
     }

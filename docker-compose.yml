@@ -6,6 +6,10 @@ services:
     volumes:
       - .:/output
     working_dir: /go/src/github.com/remind101/ssm-env
+    environment:
+      - APP_NAME
+      - JENKINS_GITHUB_USERNAME
+      - JENKINS_GITHUB_API_TOKEN
 
   test:
     build:
